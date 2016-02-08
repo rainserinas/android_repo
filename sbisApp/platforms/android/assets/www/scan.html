@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Include meta tag to ensure proper rendering and touch zooming -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Include jQuery Mobile stylesheets -->
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+    <!-- Include the jQuery library -->
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <!-- Include the jQuery Mobile library -->
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+
+    <title>Hello World</title>
+</head>
+<body id="stage" class="theme">
+
+        <div data-role="page" id="pageone">
+            <div data-role="header">
+                <h1>SBIS</h1>
+            </div>
+
+            <div data-role="main" class="ui-content">
+                <div data-role="main" class="ui-content">
+                    <input ontouchend="app.scan()" type="button" value="Scan">
+                </div>
+            </div>
+
+            <div data-role="main" class="ui-content">
+
+                <label for="product_name">Product Name:</label>
+                <input type="text" name="fname" id="product_name">
+
+                <label for="product_code">Product Code:</label>
+                <input type="text" name="fname" id="product_code" value="" disabled>
+
+                <div data-role="main" class="ui-content">
+                    <input ontouchend="send()" id="submit-btn" type="button" value="Submit">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Scripts -->
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="barcodescanner.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+
+        <script type="text/javascript">
+
+        function send(){
+            var product_code = $("#product_code").val();
+            var product_name = $("#product_name").val();
+
+            if(product_code != "" && product_name !== ""){
+                    $.mobile.loading( "show" );
+                                $.ajax({
+                                   type: "POST",
+                                   url: "http://ouroboros.esy.es/api/controller.php",
+                                   contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                                   data: {product_code: product_code, product_name: product_name, action: "insert-record"},
+                                   crossDomain: true,
+                                   cache: false,
+                                   success: function(data) {
+
+                                        $.mobile.loading( "hide" );
+                                        alert(data);
+
+                                        if(data == 'New product recorded'){
+                                            $("#product_name").val("");
+                                            $("#product_code").val("");
+                                        }
+
+                                   },
+                                   error: function(e) {
+                                       alert('Error: ' + e.message);
+                                   }
+                                });
+            }else{
+                alert("scan item and enter product name");
+            }
+        }
+
+        </script>
+
+        <!-- Scripts -->
+</body>
+</html>
